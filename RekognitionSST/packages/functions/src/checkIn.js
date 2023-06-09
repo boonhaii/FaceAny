@@ -2,8 +2,7 @@ import {
   RekognitionClient,
   CompareFacesCommand,
 } from "@aws-sdk/client-rekognition";
-import * as fs from "fs";
-import { ApiHandler, useJsonBody } from "sst/node/api";
+import { ApiHandler, useFormData } from "sst/node/api";
 
 function constructCompareFaceParams(targetImage, threshold) {
   return {
@@ -23,10 +22,9 @@ function constructCompareFaceParams(targetImage, threshold) {
   };
 }
 
-async function callAWSCompareFaces(client) {
-  const targetImage = fs.readFileSync("./testFiles/testImg.jpg");
-
+async function callAWSCompareFaces(client, targetImage) {
   const requestParams = constructCompareFaceParams(targetImage, 70);
+  console.log(requestParams);
 
   const command = new CompareFacesCommand(requestParams);
 
@@ -41,11 +39,14 @@ async function callAWSCompareFaces(client) {
 }
 
 export const handler = ApiHandler(async () => {
-  const eventBody = useJsonBody();
+  const eventFormData = useFormData();
+
+  const targetImage = eventFormData;
+  console.log(targetImage);
 
   const client = new RekognitionClient({ region: "ap-southeast-1" });
   try {
-    const compareResult = await callAWSCompareFaces(client);
+    const compareResult = await callAWSCompareFaces(client, targetImage);
     if (compareResult.FaceMatches) {
       return {
         statusCode: 200,
@@ -55,7 +56,7 @@ export const handler = ApiHandler(async () => {
       };
     } else {
       return {
-        statusCode: 200,
+        statusCode: 204,
         body: {
           message: "Did not find a matching face, please try again!",
         },
@@ -70,8 +71,3 @@ export const handler = ApiHandler(async () => {
     };
   }
 });
-
-// const client = new RekognitionClient({ region: "ap-southeast-1" });
-// const result = await callAWSCompareFaces(client);
-
-// console.log(result);
