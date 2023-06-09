@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { UUID } from "crypto";
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import Webcam from "react-webcam";
 
 export const WebcamComponent = () => {
@@ -37,6 +39,8 @@ export const WebcamComponent = () => {
 };
 
 const handleImageUpload = (imgSrc: string) => {
+  // Initialise S3Client to upload data.
+  const client = new S3Client({ region: "ap-southeast-1" });
   // Convert the base64 string to a Blob object
   const imageData = atob(imgSrc);
   const arrayBuffer = new ArrayBuffer(imageData.length);
@@ -47,8 +51,17 @@ const handleImageUpload = (imgSrc: string) => {
   const blob = new Blob([arrayBuffer], { type: "image/jpeg" });
 
   // Create a new FormData object
-  const formData = new FormData();
-  formData.append("targetImage", blob, "image.jpg"); // Append the image to the FormData
+  // const formData = new FormData();
+  // formData.append("targetImage", blob, "image.jpg"); // Append the image to the FormData
+
+  // Make a POST request to AWS-S3.
+  const command = new PutObjectCommand({
+    Bucket: "hackany",
+    Key: ,
+    Body: blob
+  });
+
+  //
 
   // Make a POST request with the FormData
   fetch("https://example.com/upload", {

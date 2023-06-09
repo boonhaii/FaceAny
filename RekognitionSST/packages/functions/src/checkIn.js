@@ -4,7 +4,7 @@ import {
 } from "@aws-sdk/client-rekognition";
 import { ApiHandler, useFormData } from "sst/node/api";
 
-function constructCompareFaceParams(targetImage, threshold) {
+function constructCompareFaceParams(targetImageName, threshold) {
   return {
     QualityFilter: "AUTO", // Whether filter is applied, default is none.
     SimilarityThreshold: threshold, // Minimal Threshold that must be met indicate same face.
@@ -17,7 +17,8 @@ function constructCompareFaceParams(targetImage, threshold) {
     },
     // Probably using Bytes, we just take the image from the frontend, then send the bytes in.
     TargetImage: {
-      Bytes: targetImage,
+      Bucket: "hackany",
+      Name: targetImageName,
     },
   };
 }
@@ -39,14 +40,13 @@ async function callAWSCompareFaces(client, targetImage) {
 }
 
 export const handler = ApiHandler(async () => {
-  const eventFormData = useFormData();
+  const eventBody = useJSONBody();
 
-  const targetImage = eventFormData;
-  console.log(targetImage);
+  const targetImageName = eventBody.targetImageName;
 
   const client = new RekognitionClient({ region: "ap-southeast-1" });
   try {
-    const compareResult = await callAWSCompareFaces(client, targetImage);
+    const compareResult = await callAWSCompareFaces(client, targetImageName);
     if (compareResult.FaceMatches) {
       return {
         statusCode: 200,
