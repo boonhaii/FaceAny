@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { UUID } from "crypto";
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import Webcam from "react-webcam";
 
 export const WebcamComponent = () => {
