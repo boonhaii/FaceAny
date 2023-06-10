@@ -2,11 +2,13 @@ import {
   RekognitionClient,
   CompareFacesCommand,
 } from "@aws-sdk/client-rekognition";
-import { ApiHandler, useJsonBody } from "sst/node/api";
+import middy from "@middy/core";
+import httpMultipartBodyParser from "@middy/http-multipart-body-parser";
+import { ApiHandler } from "sst/node/api";
 
 async function callAWSCompareFaces(
   client: RekognitionClient,
-  targetImageName: string
+  targetImage: Buffer
 ) {
   const command = new CompareFacesCommand({
     QualityFilter: "AUTO", // Whether filter is applied, default is none.
@@ -20,10 +22,7 @@ async function callAWSCompareFaces(
     },
     // Probably using Bytes, we just take the image from the frontend, then send the bytes in.
     TargetImage: {
-      S3Object: {
-        Bucket: "hackany",
-        Name: targetImageName,
-      },
+      Bytes: targetImage,
     },
   });
 
@@ -33,15 +32,13 @@ async function callAWSCompareFaces(
   return data;
 }
 
-export const handler = ApiHandler(async () => {
-  const body = useJsonBody();
+const logicHandler = ApiHandler(async (event) => {
+  const targetImageObject = event.body.targetImage;
+  const targetImageBytes = targetImageObject.content;
 
   const client = new RekognitionClient({ region: "ap-southeast-1" });
   try {
-    const compareResult = await callAWSCompareFaces(
-      client,
-      body.targetImageName
-    );
+    const compareResult = await callAWSCompareFaces(client, targetImageBytes);
     if (compareResult.FaceMatches) {
       return {
         statusCode: 200,
@@ -57,6 +54,7 @@ export const handler = ApiHandler(async () => {
       }),
     };
   } catch (e) {
+    console.log(e);
     return {
       statusCode: 500,
       body: JSON.stringify({
@@ -67,3 +65,5 @@ export const handler = ApiHandler(async () => {
     };
   }
 });
+
+export const handler = middy(logicHandler).use(httpMultipartBodyParser());

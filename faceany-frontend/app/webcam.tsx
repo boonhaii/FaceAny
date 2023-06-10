@@ -19,7 +19,7 @@ export const WebcamComponent = () => {
 
     // Clean up the interval on component unmount
     return () => clearInterval(interval);
-  }, []); // Empty dependency array to run only once on mount
+  }, [imgSrc]); // Empty dependency array to run only once on mount
 
   const capture = useCallback(() => {
     if (!webcamRef.current) {
@@ -40,9 +40,11 @@ export const WebcamComponent = () => {
 
 const handleImageUpload = (imgSrc: string) => {
   // Initialise S3Client to upload data.
-  const client = new S3Client({ region: "ap-southeast-1" });
+  // const client = new S3Client({ region: "ap-southeast-1" });
   // Convert the base64 string to a Blob object
-  const imageData = atob(imgSrc);
+  const imageData = atob(
+    imgSrc.replace(/^data:image\/(png|jpeg|jpg);base64,/, "")
+  );
   const arrayBuffer = new ArrayBuffer(imageData.length);
   const uintArray = new Uint8Array(arrayBuffer);
   for (let i = 0; i < imageData.length; i++) {
@@ -51,20 +53,20 @@ const handleImageUpload = (imgSrc: string) => {
   const blob = new Blob([arrayBuffer], { type: "image/jpeg" });
 
   // Create a new FormData object
-  // const formData = new FormData();
-  // formData.append("targetImage", blob, "image.jpg"); // Append the image to the FormData
+  const formData = new FormData();
+  formData.append("targetImage", blob, "image.jpg"); // Append the image to the FormData
 
   // Make a POST request to AWS-S3.
-  const command = new PutObjectCommand({
-    Bucket: "hackany",
-    Key: ,
-    Body: blob
-  });
+  // const command = new PutObjectCommand({
+  //   Bucket: "hackany",
+  //   Key: ,
+  //   Body: blob
+  // });
 
-  //
+  console.log(formData);
 
   // Make a POST request with the FormData
-  fetch("https://example.com/upload", {
+  fetch("https://smh7spdpmi.execute-api.ap-southeast-1.amazonaws.com/checkin", {
     method: "POST",
     body: formData,
   })
