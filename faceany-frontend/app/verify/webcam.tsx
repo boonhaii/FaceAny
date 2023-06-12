@@ -38,10 +38,9 @@ export const WebcamComponent = () => {
 };
 
 const handleImageUpload = (imgSrc: string) => {
-  // Initialise S3Client to upload data.
-  const client = new S3Client({ region: "ap-southeast-1" });
-  // Convert the base64 string to a Blob object
-  const imageData = atob(imgSrc);
+  const imageData = atob(
+    imgSrc.replace(/^data:image\/(png|jpeg|jpg);base64,/, "")
+  );
   const arrayBuffer = new ArrayBuffer(imageData.length);
   const uintArray = new Uint8Array(arrayBuffer);
   for (let i = 0; i < imageData.length; i++) {

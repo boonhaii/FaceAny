@@ -31,9 +31,13 @@ const uploadPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     method: "POST",
     body: formData,
   });
-
   if (upload.ok) {
     console.log("Uploaded successfully!");
+    const indexFaceResponse = await fetch(
+      "https://smh7spdpmi.execute-api.ap-southeast-1.amazonaws.com/setup",
+      { method: "POST", body: JSON.stringify({ imageFileName: `${filename}` }) }
+    );
+    console.log(indexFaceResponse);
   } else {
     console.error("Upload failed.");
   }
