@@ -92,11 +92,11 @@ const logicHandler = ApiHandler(async (event) => {
 
     const faceObject = faceMatches[0].Face as unknown as Face;
     const faceId = faceObject.FaceId as string;
-    const person = mapFaceIdToPerson(faceId);
     return {
       statusCode: 200,
       body: JSON.stringify({
-        message: `Check in successful for user: ${person}.`,
+        message: `Check in successful.`,
+        faceId: faceId,
       }),
     };
   } catch (e) {
