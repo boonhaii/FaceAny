@@ -7,7 +7,7 @@ import { NextResponse } from "next/server";
 
 export async function PUT(req: Request) {
   const { searchParams } = new URL(req.url);
-  const key = searchParams.get("fileName") as string;
+  const key = searchParams.get("filename") as string;
   const filename = decodeURI(key);
 
   const client = new RekognitionClient({ region: "ap-southeast-1" });
