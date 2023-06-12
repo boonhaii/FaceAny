@@ -1,54 +1,75 @@
 "use client";
-
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { WebcamComponent } from "../webcam";
-
-const Users = ["Boon Hai", "Jeremy", "Vanessa", "Jin Peng"];
+import { AddUser } from "./AddUser";
 
 export default function Upload() {
   const [result, setResult] = useState("");
-  const [user, setUser] = useState<string | null>(null);
+  const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      const usersFromFetch = await (await fetch("/api/users")).json();
+      console.log(usersFromFetch);
+      if (usersFromFetch) {
+        setUsers(usersFromFetch);
+      }
+    })();
+  }, []);
 
   const handleUpload = useCallback(
     async (src: string) => {
-      if (!user) {
+      if (!selectedUser) {
         return;
       }
-      const file = await urltoFile(src, user + ".jpg", "image/jpeg");
+      const file = await urltoFile(src, selectedUser + ".jpg", "image/jpeg");
       console.log("file constructed");
-      const success = await uploadPhoto(file, user);
+      const success = await uploadPhoto(file, selectedUser);
       if (success) {
         setResult("Photo uploaded successfully!");
         return;
       }
       setResult("Upload failed");
     },
-    [user]
+    [selectedUser]
   );
 
   return (
     <div className="flex flex-col p-10">
-      <div className="flex-1">
-        <p>User Selection</p>
-        <select
-          className="bg-black"
-          onChange={(e) => {
-            setUser(e.target.value);
-            setResult("");
+      <div className="flex flex-1">
+        <div>
+          <p>User Selection</p>
+          <select
+            className="bg-black"
+            onChange={(e) => {
+              setSelectedUser(e.target.value);
+              setResult("");
+            }}
+            value={selectedUser ?? ""}
+          >
+            <option value="">Select a user</option>
+            {users.map((userName) => (
+              <option key={userName} value={userName}>
+                {userName}
+              </option>
+            ))}
+          </select>
+        </div>
+        <AddUser
+          className="ml-10"
+          onSubmit={async (newUser) => {
+            const response = await fetch(`/api/users?user=${newUser}`, {
+              method: "POST",
+            });
+            setUsers(await response.json());
           }}
-        >
-          <option value="">Select a user</option>
-          {Users.map((userName) => (
-            <option key={userName} value={userName}>
-              {userName}
-            </option>
-          ))}
-        </select>
+        />
       </div>
       <div className="flex-1 max-w-xs">
-        {user ? (
+        {selectedUser ? (
           <>
-            <p>Snap a photo for {user}!</p>
+            <p>Snap a photo for {selectedUser}!</p>
             <WebcamComponent onCapture={handleUpload} />
             <p>{result}</p>
           </>

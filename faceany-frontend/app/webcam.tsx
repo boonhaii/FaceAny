@@ -2,6 +2,7 @@
 
 import React, { useCallback, useRef, useState } from "react";
 import Webcam from "react-webcam";
+import Button from "./button";
 
 interface Props {
   onCapture: (src: string) => void;
@@ -30,11 +31,7 @@ export const WebcamComponent = ({ onCapture }: Props) => {
         screenshotFormat="image/jpeg"
         mirrored={true}
       />
-      <div className="flex flex-1 justify-center p-5">
-        <button className="px-3 rounded-full bg-slate-700" onClick={capture}>
-          Capture photo
-        </button>
-      </div>
+      <Button onClick={capture}>Capture photo</Button>
       {imgSrc && <img src={imgSrc} />}
     </div>
   );
