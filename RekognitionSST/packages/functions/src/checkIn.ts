@@ -1,6 +1,5 @@
 import {
   RekognitionClient,
-  CompareFacesCommand,
   SearchFacesByImageCommand,
   Face,
 } from "@aws-sdk/client-rekognition";
