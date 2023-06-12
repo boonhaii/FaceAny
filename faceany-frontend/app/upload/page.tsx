@@ -3,6 +3,8 @@
 import { useCallback, useState } from "react";
 import { WebcamComponent } from "../webcam";
 
+const Users = ["Boon Hai", "Jeremy", "Vanessa", "Jin Peng"];
+
 export default function Upload() {
   const [result, setResult] = useState("");
   const [user, setUser] = useState<string | null>(null);
@@ -25,7 +27,7 @@ export default function Upload() {
   );
 
   return (
-    <div className="flex p-10">
+    <div className="flex flex-col p-10">
       <div className="flex-1">
         <p>User Selection</p>
         <select
@@ -36,12 +38,14 @@ export default function Upload() {
           }}
         >
           <option value="">Select a user</option>
-          <option value="Boon Hai">Boon Hai</option>
-          <option value="Jeremy">Jeremy</option>
-          <option value="Vanessa">Vanessa</option>
+          {Users.map((userName) => (
+            <option key={userName} value={userName}>
+              {userName}
+            </option>
+          ))}
         </select>
       </div>
-      <div className="flex-1">
+      <div className="flex-1 max-w-xs">
         {user ? (
           <>
             <p>Snap a photo for {user}!</p>
