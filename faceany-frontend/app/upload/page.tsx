@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { WebcamComponent } from "../../webcam";
+import { WebcamComponent } from "../webcam";
 
 export default function Upload() {
   const [result, setResult] = useState("");
