@@ -88,6 +88,9 @@ const uploadPhoto = async (file: File, user: string) => {
     return false;
   }
 
+  const { faceId } = await indexFaceResponse.json();
+  await fetch(`/api/face?faceId=${faceId}&name=${user}`, { method: "PUT" });
+
   return true;
 };
 
