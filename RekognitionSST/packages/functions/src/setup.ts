@@ -28,7 +28,7 @@ async function addImageToCollection(
 
 const logicHandler = ApiHandler(async (event) => {
   const eventBody = useJsonBody();
-  const imageFileName = eventBody.imageFileName;
+  const imageFileName = decodeURI(eventBody.imageFileName);
 
   if (!imageFileName) {
     return {
