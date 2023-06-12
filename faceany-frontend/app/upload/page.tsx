@@ -73,16 +73,22 @@ const uploadPhoto = async (file: File, user: string) => {
     body: formData,
   });
 
-  if (upload.ok) {
-    const indexFaceResponse = await fetch(
-      "https://smh7spdpmi.execute-api.ap-southeast-1.amazonaws.com/setup",
-      { method: "POST", body: JSON.stringify({ imageFileName: filename }) }
-    );
-    if (indexFaceResponse.status === 200) {
-      return upload.ok;
-    }
+  if (!upload.ok) {
+    console.error("Upload failed");
+    return false;
   }
-  console.error("Upload failed.");
+
+  const indexFaceResponse = await fetch(
+    "https://smh7spdpmi.execute-api.ap-southeast-1.amazonaws.com/setup",
+    { method: "POST", body: JSON.stringify({ imageFileName: filename }) }
+  );
+
+  if (indexFaceResponse.status !== 200) {
+    console.error("Upload failed");
+    return false;
+  }
+
+  return true;
 };
 
 function urltoFile(url: string, filename: string, mimeType: string) {
