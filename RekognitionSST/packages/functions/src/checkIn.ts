@@ -33,13 +33,25 @@ async function callAWSCompareFaces(
 }
 
 const logicHandler = ApiHandler(async (event) => {
-  const targetImageObject = event.body.targetImage;
+  const eventBody = event.body as unknown as {
+    targetImage: { content: Buffer };
+  };
+  if (!eventBody) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: "No image detected. Please check the check in request again.",
+      }),
+    };
+  }
+  const targetImageObject = eventBody.targetImage;
   const targetImageBytes = targetImageObject.content;
 
   const client = new RekognitionClient({ region: "ap-southeast-1" });
   try {
     const compareResult = await callAWSCompareFaces(client, targetImageBytes);
-    if (compareResult.FaceMatches) {
+    const faceMatches = compareResult.FaceMatches;
+    if (faceMatches && faceMatches.length !== 0) {
       return {
         statusCode: 200,
         body: JSON.stringify({
@@ -54,7 +66,6 @@ const logicHandler = ApiHandler(async (event) => {
       }),
     };
   } catch (e) {
-    console.log(e);
     return {
       statusCode: 500,
       body: JSON.stringify({
