@@ -3,8 +3,6 @@ import {
   IndexFacesCommand,
 } from "@aws-sdk/client-rekognition";
 import middy from "@middy/core";
-import jsonBodyParser from "@middy/http-json-body-parser";
-import httpJsonBodyParser from "@middy/http-json-body-parser";
 import { ApiHandler, useJsonBody } from "sst/node/api";
 
 async function addImageToCollection(
@@ -15,7 +13,7 @@ async function addImageToCollection(
     CollectionId: "faceAnyUsers",
     Image: {
       S3Object: {
-        Bucket: "hackAny",
+        Bucket: "hackany",
         Name: imageFile,
       },
     },
@@ -60,6 +58,7 @@ const logicHandler = ApiHandler(async (event) => {
       };
     }
   } catch (e) {
+    console.log(e);
     return {
       statusCode: 500,
       body: JSON.stringify({
