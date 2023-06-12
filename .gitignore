@@ -16,3 +16,4 @@ node_modules
 
 # Mock Database File
 RekognitionSST/packages/functions/src/identityDatabase.ts
+.vercel
