@@ -7,12 +7,6 @@ import middy from "@middy/core";
 import httpMultipartBodyParser from "@middy/http-multipart-body-parser";
 import { ApiHandler } from "sst/node/api";
 
-import { identityDatabase } from "./identityDatabase";
-
-function mapFaceIdToPerson(faceId: string) {
-  return identityDatabase[faceId];
-}
-
 async function callAWSSearchCollection(
   client: RekognitionClient,
   targetImage: Buffer
@@ -80,6 +74,7 @@ const logicHandler = ApiHandler(async (event) => {
       client,
       targetImageBytes
     );
+
     const faceMatches = searchCollectionResult.FaceMatches;
     if (!faceMatches || faceMatches.length === 0) {
       return {
