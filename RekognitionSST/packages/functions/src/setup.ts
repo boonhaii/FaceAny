@@ -47,6 +47,7 @@ const logicHandler = ApiHandler(async (event) => {
         statusCode: 200,
         body: JSON.stringify({
           message: "Successfully added photo to database.",
+          faceId: data.FaceRecords[0].Face.FaceId,
         }),
       };
     } else {
